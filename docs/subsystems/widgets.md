@@ -330,3 +330,103 @@ shown here) and then sets up a click handler like below:
 ```
 
 And then we are basically done!
+
+## zform interactive forms
+
+In addition to the "choices" type described above, zform also supports
+a "form" type that renders interactive forms with input fields directly
+in the message view. This allows bots to collect structured data from
+users without requiring them to type freeform messages.
+
+### Form type payload
+
+A form widget uses the same `widget_type: "zform"` envelope, but with
+`type: "form"` in the extra_data:
+
+```json
+{
+    "widget_type": "zform",
+    "extra_data": {
+        "type": "form",
+        "heading": "Create a new card",
+        "fields": [
+            {"name": "title", "type": "text", "label": "Title", "required": true},
+            {"name": "description", "type": "textarea", "label": "Description",
+             "placeholder": "Describe the card..."},
+            {
+                "name": "category",
+                "type": "select",
+                "label": "Category",
+                "options": [
+                    {"label": "Bug", "value": "bug"},
+                    {"label": "Feature", "value": "feature"}
+                ]
+            },
+            {
+                "name": "tags",
+                "type": "checkbox_group",
+                "label": "Tags",
+                "options": [
+                    {"label": "Urgent", "value": "urgent"},
+                    {"label": "Blocked", "value": "blocked"}
+                ]
+            },
+            {"name": "due_date", "type": "date", "label": "Due Date"}
+        ],
+        "actions": [
+            {"name": "submit", "label": "Submit", "style": "primary"},
+            {"name": "cancel", "label": "Cancel"}
+        ]
+    }
+}
+```
+
+### Supported field types
+
+| Type             | Description                         | Renders as             |
+| ---------------- | ----------------------------------- | ---------------------- |
+| `text`           | Single-line text input              | `<input type="text">`  |
+| `textarea`       | Multi-line text area                | `<textarea>`           |
+| `select`         | Dropdown selection                  | `<select>`             |
+| `checkbox_group` | Multiple checkboxes                 | Multiple `<input type="checkbox">` |
+| `date`           | Date picker                         | `<input type="date">`  |
+
+### Form submission data flow
+
+Unlike the "choices" type which sends a reply message via
+`transmit.reply_message`, the "form" type uses the submessage
+callback system:
+
+1. The bot sends a message with `widget_content` containing the form schema.
+2. The client renders the form inline in the message view.
+3. When the user clicks an action button, the client collects all field
+   values and sends a `form_submit` submessage via the callback:
+
+```json
+{
+    "type": "form_submit",
+    "action": "submit",
+    "data": {
+        "title": "Login page broken",
+        "description": "Users cannot log in after the last deploy",
+        "category": "bug",
+        "tags": ["urgent"],
+        "due_date": "2026-02-20"
+    }
+}
+```
+
+4. The bot receives this as a submessage event on its event queue and
+   can process the structured data accordingly.
+
+After submission, the form enters a disabled "submitted" state for
+all viewers of the message. The server validates both the initial
+form schema (via `check_widget_content`) and submission payloads
+(via `validate_zform_data` in `zerver/views/submessage.py`).
+
+### Graceful degradation
+
+Clients that don't support the form widget type will show the
+message's `content` field as plain text. Bots should set the
+message content to a meaningful fallback (e.g., "Please fill
+out the form above" or a text version of the form).
