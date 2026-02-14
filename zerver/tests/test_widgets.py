@@ -647,6 +647,92 @@ class WidgetContentTestCase(ZulipTestCase):
         assert_success(dict(type="new_task", key=7, task="eat", desc="", completed=False))
         assert_success(dict(type="strike", key="5,9"))
 
+    def test_zform_form_submit_validation(self) -> None:
+        sender = self.example_user("cordelia")
+        stream_name = "Verona"
+        content = "does-not-matter"
+
+        zform_data = dict(
+            type="form",
+            heading="Create Card",
+            fields=[
+                {"name": "title", "type": "text", "label": "Title"},
+            ],
+            actions=[
+                {"name": "submit", "label": "Submit"},
+            ],
+        )
+
+        widget_content = dict(
+            widget_type="zform",
+            extra_data=zform_data,
+        )
+
+        payload = dict(
+            type="stream",
+            to=orjson.dumps(stream_name).decode(),
+            topic="whatever",
+            content=content,
+            widget_content=orjson.dumps(widget_content).decode(),
+        )
+        result = self.api_post(sender, "/api/v1/messages", payload)
+        self.assert_json_success(result)
+
+        message = self.get_last_message()
+
+        def post_submessage(content: str) -> "TestHttpResponse":
+            payload = dict(
+                message_id=message.id,
+                msg_type="widget",
+                content=content,
+            )
+            return self.api_post(sender, "/api/v1/submessage", payload)
+
+        def assert_error(content: str, error: str) -> None:
+            result = post_submessage(content)
+            self.assert_json_error_contains(result, error)
+
+        assert_error("bogus", "Invalid json for submessage")
+        assert_error('""', "not a dict")
+        assert_error("[]", "not a dict")
+
+        assert_error('{"type": "bogus"}', "Unknown type for zform data: bogus")
+
+        # form_submit missing action.
+        assert_error('{"type": "form_submit"}', "action key is missing")
+
+        # form_submit missing data.
+        assert_error(
+            '{"type": "form_submit", "action": "submit"}',
+            "data key is missing",
+        )
+
+        # form_submit with wrong type for data.
+        assert_error(
+            '{"type": "form_submit", "action": "submit", "data": "bad"}',
+            'zform data["data"] is not a dict',
+        )
+
+        # form_submit with wrong type for action.
+        assert_error(
+            '{"type": "form_submit", "action": 99, "data": {}}',
+            'zform data["action"] is not a string',
+        )
+
+        # form_submit with extraneous keys.
+        assert_error(
+            '{"type": "form_submit", "action": "submit", "data": {}, "extra": 1}',
+            "Unexpected arguments: extra",
+        )
+
+        def assert_success(data: dict[str, object]) -> None:
+            content = orjson.dumps(data).decode()
+            result = post_submessage(content)
+            self.assert_json_success(result)
+
+        assert_success(dict(type="form_submit", action="submit", data={"title": "My Card"}))
+        assert_success(dict(type="form_submit", action="submit", data={}))
+
     def test_get_widget_type(self) -> None:
         sender = self.example_user("cordelia")
         stream_name = "Verona"

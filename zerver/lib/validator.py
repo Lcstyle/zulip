@@ -612,6 +612,24 @@ def validate_todo_data(todo_data: object, is_widget_author: bool) -> None:
     raise ValidationError(f"Unknown type for todo data: {todo_data['type']}")
 
 
+def validate_zform_data(zform_data: object, is_widget_author: bool) -> None:
+    check_dict([("type", check_string)])("zform data", zform_data)
+    assert isinstance(zform_data, dict)
+
+    if zform_data["type"] == "form_submit":
+        checker = check_dict_only(
+            [
+                ("type", check_string),
+                ("action", check_string),
+                ("data", check_dict([])),
+            ]
+        )
+        checker("zform data", zform_data)
+        return
+
+    raise ValidationError(f"Unknown type for zform data: {zform_data['type']}")
+
+
 def check_string_or_int_list(var_name: str, val: object) -> str | list[int]:
     if isinstance(val, str):
         return val
