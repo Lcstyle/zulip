@@ -43,7 +43,7 @@
     </div>
     <div class="widget-form-actions">
         {{#each actions}}
-            <button class="widget-form-action widget-form-action-{{ this.style }}"
+            <button class="widget-form-action{{#if this.style}} widget-form-action-{{ this.style }}{{/if}}"
                 data-action-name="{{ this.name }}">{{ this.label }}</button>
         {{/each}}
     </div>
