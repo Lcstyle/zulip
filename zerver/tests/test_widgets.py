@@ -267,6 +267,62 @@ class WidgetContentTestCase(ZulipTestCase):
         self.assertEqual(submessage.msg_type, "widget")
         self.assertEqual(orjson.loads(submessage.content), expected_submessage_content)
 
+    def test_explicit_zform_form_content(self) -> None:
+        # Users can send zform form widget_content directly on messages
+        # using the `widget_content` field.
+
+        sender = self.example_user("cordelia")
+        stream_name = "Verona"
+        content = "does-not-matter"
+        zform_data = dict(
+            type="form",
+            heading="Create Card",
+            fields=[
+                {"name": "title", "type": "text", "label": "Title"},
+                {
+                    "name": "category",
+                    "type": "select",
+                    "label": "Category",
+                    "options": [
+                        {"label": "Bug", "value": "bug"},
+                        {"label": "Feature", "value": "feature"},
+                    ],
+                },
+            ],
+            actions=[
+                {"name": "submit", "label": "Submit"},
+            ],
+        )
+
+        widget_content = dict(
+            widget_type="zform",
+            extra_data=zform_data,
+        )
+
+        check_widget_content(widget_content)
+
+        payload = dict(
+            type="stream",
+            to=orjson.dumps(stream_name).decode(),
+            topic="whatever",
+            content=content,
+            widget_content=orjson.dumps(widget_content).decode(),
+        )
+        result = self.api_post(sender, "/api/v1/messages", payload)
+        self.assert_json_success(result)
+
+        message = self.get_last_message()
+        self.assertEqual(message.content, content)
+
+        expected_submessage_content = dict(
+            widget_type="zform",
+            extra_data=zform_data,
+        )
+
+        submessage = SubMessage.objects.get(message_id=message.id)
+        self.assertEqual(submessage.msg_type, "widget")
+        self.assertEqual(orjson.loads(submessage.content), expected_submessage_content)
+
     def test_todo(self) -> None:
         # This also helps us get test coverage that could apply
         # to future widgets.
