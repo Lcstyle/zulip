@@ -4,12 +4,13 @@ import type {PollWidgetOutboundData} from "./poll_data.ts";
 import type {TodoWidgetOutboundData} from "./todo_widget.ts";
 import type {Event} from "./widget_data.ts";
 import type {AnyWidgetData} from "./widget_schema.ts";
+import type {FormSubmitData} from "./zform_data.ts";
 
 type HandleInboundEventsFunction = (events: Event[]) => void;
 
 export type PostToServerFunction = (data: {msg_type: string; data: WidgetOutboundData}) => void;
 
-type WidgetOutboundData = PollWidgetOutboundData | TodoWidgetOutboundData;
+type WidgetOutboundData = PollWidgetOutboundData | TodoWidgetOutboundData | FormSubmitData;
 
 // These are poll, todo, and zform implementations.
 // They are currently injected into us from another module

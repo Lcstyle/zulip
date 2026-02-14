@@ -1,18 +1,23 @@
 import * as z from "zod/mini";
 
 /*
-    The zform widget is essentially support for creating
-    a "choices" form that presents the user (in a message
-    in the messages view) with a list of choices and
-    buttons to push.
+    The zform widget supports two types:
 
-    The prime example of this is our trivia bot.
+    1. "choices" — presents the user with a list of choices and buttons.
+       The prime example is the trivia bot. When the user clicks a
+       choice, a reply is sent as a regular message.
 
-    See docs/subsystems/widgets.md and go to the
-    zform-trivia-quiz-bot section for more details.
+    2. "form" — presents the user with a form containing input fields
+       (text, textarea, select, checkbox_group, date) and action
+       buttons. When the user submits, data is sent as a submessage
+       back to the bot (message sender).
+
+    See docs/subsystems/widgets.md for more details.
 */
 
-export const zform_widget_extra_data_schema = z.object({
+// --- Choices type (existing) ---
+
+export const zform_choices_extra_data_schema = z.object({
     choices: z.array(
         z.object({
             type: z.string(),
@@ -25,4 +30,96 @@ export const zform_widget_extra_data_schema = z.object({
     type: z.literal("choices"),
 });
 
+export type ZFormChoicesExtraData = z.infer<typeof zform_choices_extra_data_schema>;
+
+// --- Form type (new) ---
+
+const form_option_schema = z.object({
+    label: z.string(),
+    value: z.string(),
+});
+
+const form_text_field_schema = z.object({
+    name: z.string(),
+    type: z.literal("text"),
+    label: z.string(),
+    required: z.optional(z.boolean()),
+    placeholder: z.optional(z.string()),
+});
+
+const form_textarea_field_schema = z.object({
+    name: z.string(),
+    type: z.literal("textarea"),
+    label: z.string(),
+    required: z.optional(z.boolean()),
+    placeholder: z.optional(z.string()),
+});
+
+const form_select_field_schema = z.object({
+    name: z.string(),
+    type: z.literal("select"),
+    label: z.string(),
+    required: z.optional(z.boolean()),
+    options: z.array(form_option_schema),
+});
+
+const form_checkbox_group_field_schema = z.object({
+    name: z.string(),
+    type: z.literal("checkbox_group"),
+    label: z.string(),
+    required: z.optional(z.boolean()),
+    options: z.array(form_option_schema),
+});
+
+const form_date_field_schema = z.object({
+    name: z.string(),
+    type: z.literal("date"),
+    label: z.string(),
+    required: z.optional(z.boolean()),
+});
+
+export const form_field_schema = z.discriminatedUnion("type", [
+    form_text_field_schema,
+    form_textarea_field_schema,
+    form_select_field_schema,
+    form_checkbox_group_field_schema,
+    form_date_field_schema,
+]);
+
+export type FormField = z.infer<typeof form_field_schema>;
+
+export const form_action_schema = z.object({
+    name: z.string(),
+    label: z.string(),
+    style: z.optional(z.string()),
+});
+
+export type FormAction = z.infer<typeof form_action_schema>;
+
+export const zform_form_extra_data_schema = z.object({
+    type: z.literal("form"),
+    heading: z.string(),
+    fields: z.array(form_field_schema),
+    actions: z.array(form_action_schema),
+});
+
+export type ZFormFormExtraData = z.infer<typeof zform_form_extra_data_schema>;
+
+// --- Discriminated union of all zform types ---
+
+export const zform_widget_extra_data_schema = z.discriminatedUnion("type", [
+    zform_choices_extra_data_schema,
+    zform_form_extra_data_schema,
+]);
+
 export type ZFormExtraData = z.infer<typeof zform_widget_extra_data_schema>;
+
+// --- Form submission outbound data ---
+
+export const form_submit_schema = z.object({
+    type: z.literal("form_submit"),
+    action: z.string(),
+    data: z.record(z.string(), z.unknown()),
+});
+
+export type FormSubmitData = z.infer<typeof form_submit_schema>;
