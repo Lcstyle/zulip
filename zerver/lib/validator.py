@@ -466,6 +466,56 @@ def check_widget_content(widget_content: object) -> dict[str, Any]:
 
             return widget_content
 
+        if extra_data["type"] == "form":
+            check_options = check_list(
+                check_dict(
+                    [
+                        ("label", check_string),
+                        ("value", check_string),
+                    ]
+                ),
+            )
+
+            check_field = check_dict(
+                [
+                    ("name", check_string),
+                    ("type", check_string_in(["text", "textarea", "select", "checkbox_group", "date"])),
+                    ("label", check_string),
+                ],
+                optional_keys=[
+                    ("options", check_options),
+                ],
+            )
+
+            check_action = check_dict(
+                [
+                    ("name", check_string),
+                    ("label", check_string),
+                ]
+            )
+
+            # We re-check "type" here just to avoid it looking
+            # like we have extraneous keys.
+            checker = check_dict(
+                [
+                    ("type", equals("form")),
+                    ("heading", check_string),
+                    ("fields", check_list(check_field)),
+                    ("actions", check_list(check_action)),
+                ]
+            )
+
+            checker("extra_data", extra_data)
+
+            # Validate that select and checkbox_group fields have options.
+            for i, field in enumerate(extra_data["fields"]):
+                if field["type"] in ("select", "checkbox_group") and "options" not in field:
+                    raise ValidationError(
+                        f'extra_data["fields"][{i}] of type {field["type"]} is missing options'
+                    )
+
+            return widget_content
+
         raise ValidationError("unknown zform type: " + extra_data["type"])
 
     raise ValidationError("unknown widget type: " + widget_type)

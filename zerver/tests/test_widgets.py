@@ -60,6 +60,120 @@ class WidgetContentTestCase(ZulipTestCase):
 
         check_widget_content(obj)
 
+    def test_zform_form_validation(self) -> None:
+        def assert_error(obj: object, msg: str) -> None:
+            with self.assertRaisesRegex(ValidationError, re.escape(msg)):
+                check_widget_content(obj)
+
+        extra_data: dict[str, Any] = {"type": "form"}
+        obj = dict(widget_type="zform", extra_data=extra_data)
+
+        # Missing heading.
+        assert_error(obj, "heading key is missing from extra_data")
+
+        extra_data["heading"] = "Create Card"
+
+        # Missing fields.
+        assert_error(obj, "fields key is missing from extra_data")
+
+        extra_data["fields"] = []
+
+        # Missing actions.
+        assert_error(obj, "actions key is missing from extra_data")
+
+        extra_data["actions"] = []
+
+        # Valid minimal form (empty fields/actions lists).
+        check_widget_content(obj)
+
+        # Fields must be a list.
+        extra_data["fields"] = "not a list"
+        assert_error(obj, 'extra_data["fields"] is not a list')
+        extra_data["fields"] = []
+
+        # Actions must be a list.
+        extra_data["actions"] = "not a list"
+        assert_error(obj, 'extra_data["actions"] is not a list')
+        extra_data["actions"] = []
+
+        # Field must be a dict.
+        extra_data["fields"] = [99]
+        assert_error(obj, 'extra_data["fields"][0] is not a dict')
+
+        # Field missing required keys.
+        extra_data["fields"] = [{"name": "title"}]
+        assert_error(obj, 'type key is missing from extra_data["fields"][0]')
+
+        extra_data["fields"] = [{"name": "title", "type": "text"}]
+        assert_error(obj, 'label key is missing from extra_data["fields"][0]')
+
+        # Invalid field type.
+        extra_data["fields"] = [
+            {"name": "title", "type": "invalid_type", "label": "Title"},
+        ]
+        assert_error(obj, 'Invalid extra_data["fields"][0]["type"]')
+
+        # select field missing options.
+        extra_data["fields"] = [
+            {"name": "cat", "type": "select", "label": "Category"},
+        ]
+        assert_error(obj, 'extra_data["fields"][0] of type select is missing options')
+
+        # checkbox_group field missing options.
+        extra_data["fields"] = [
+            {"name": "tags", "type": "checkbox_group", "label": "Tags"},
+        ]
+        assert_error(obj, 'extra_data["fields"][0] of type checkbox_group is missing options')
+
+        # options must be a list.
+        extra_data["fields"] = [
+            {"name": "cat", "type": "select", "label": "Category", "options": "bad"},
+        ]
+        assert_error(obj, 'extra_data["fields"][0]["options"] is not a list')
+
+        # Option must be a dict.
+        extra_data["fields"] = [
+            {"name": "cat", "type": "select", "label": "Category", "options": [42]},
+        ]
+        assert_error(obj, 'extra_data["fields"][0]["options"][0] is not a dict')
+
+        # Option missing required keys.
+        extra_data["fields"] = [
+            {"name": "cat", "type": "select", "label": "Category", "options": [{"label": "FAQ"}]},
+        ]
+        assert_error(obj, 'value key is missing from extra_data["fields"][0]["options"][0]')
+
+        # Action must be a dict.
+        extra_data["fields"] = []
+        extra_data["actions"] = [99]
+        assert_error(obj, 'extra_data["actions"][0] is not a dict')
+
+        # Action missing required keys.
+        extra_data["actions"] = [{"name": "submit"}]
+        assert_error(obj, 'label key is missing from extra_data["actions"][0]')
+
+        # Valid full form with all field types.
+        extra_data["fields"] = [
+            {"name": "title", "type": "text", "label": "Title"},
+            {"name": "body", "type": "textarea", "label": "Content"},
+            {
+                "name": "cat",
+                "type": "select",
+                "label": "Category",
+                "options": [{"label": "FAQ", "value": "faq"}],
+            },
+            {
+                "name": "tags",
+                "type": "checkbox_group",
+                "label": "Tags",
+                "options": [{"label": "Options", "value": "options"}],
+            },
+            {"name": "date", "type": "date", "label": "Review By"},
+        ]
+        extra_data["actions"] = [{"name": "submit", "label": "Submit"}]
+
+        check_widget_content(obj)
+
     def test_message_error_handling(self) -> None:
         sender = self.example_user("cordelia")
         stream_name = "Verona"
