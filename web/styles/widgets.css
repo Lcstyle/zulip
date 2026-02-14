@@ -341,3 +341,105 @@ input {
         cursor: not-allowed;
     }
 }
+
+/* Interactive form widget */
+.widget-form {
+    max-width: 400px;
+
+    .widget-form-heading {
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .widget-form-field {
+        margin-bottom: 8px;
+    }
+
+    .widget-form-label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 2px;
+        font-size: 0.9285em; /* 13px at 14px / em */
+    }
+
+    .widget-form-required {
+        color: hsl(0deg 80% 50%);
+    }
+
+    .widget-form-input,
+    .widget-form-textarea,
+    .widget-form-select {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid hsl(0deg 0% 80%);
+        box-shadow: inset 0 1px 1px hsl(0deg 0% 0% / 7.5%);
+        border-radius: 4px;
+        padding: 4px 6px;
+        color: var(--color-text-default);
+        font-family: inherit;
+        font-size: inherit;
+
+        &:focus {
+            border-color: hsl(206deg 80% 62% / 80%);
+            outline: 0;
+            box-shadow: none;
+            background-color: var(--color-background-widget-input);
+            transition:
+                border-color linear 0.2s,
+                box-shadow linear 0.2s;
+        }
+    }
+
+    .widget-form-textarea {
+        resize: vertical;
+        min-height: 60px;
+    }
+
+    .widget-form-checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 12px;
+    }
+
+    .widget-form-checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: normal;
+        cursor: pointer;
+    }
+
+    .widget-form-actions {
+        display: flex;
+        gap: 6px;
+        margin-top: 10px;
+    }
+
+    .widget-form-action {
+        border-radius: 3px;
+        padding: 4px 14px;
+        font-family: inherit;
+        font-size: inherit;
+        cursor: pointer;
+        border: 1px solid hsl(0deg 0% 80%);
+        background-color: var(--color-background-widget-button);
+    }
+
+    .widget-form-action-primary {
+        background-color: hsl(207deg 56% 48%);
+        color: hsl(0deg 0% 100%);
+        border-color: hsl(207deg 56% 48%);
+    }
+
+    .widget-form-action-danger {
+        background-color: hsl(0deg 56% 48%);
+        color: hsl(0deg 0% 100%);
+        border-color: hsl(0deg 56% 48%);
+    }
+
+    .widget-form-submitted {
+        font-style: italic;
+        color: hsl(153deg 40% 40%);
+        padding: 4px 0;
+    }
+}
