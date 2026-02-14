@@ -1,0 +1,50 @@
+<div class="widget-form">
+    <div class="widget-form-heading">{{ heading }}</div>
+    <div class="widget-form-fields">
+        {{#each fields}}
+            <div class="widget-form-field" data-field-name="{{ this.name }}">
+                <label class="widget-form-label">
+                    {{ this.label }}
+                    {{#if this.required}}<span class="widget-form-required">*</span>{{/if}}
+                </label>
+                {{#if this.is_text}}
+                    <input type="text" class="widget-form-input" name="{{ this.name }}"
+                        {{#if this.placeholder}}placeholder="{{ this.placeholder }}"{{/if}}
+                        {{#if this.required}}required{{/if}} />
+                {{/if}}
+                {{#if this.is_textarea}}
+                    <textarea class="widget-form-textarea" name="{{ this.name }}" rows="4"
+                        {{#if this.placeholder}}placeholder="{{ this.placeholder }}"{{/if}}
+                        {{#if this.required}}required{{/if}}></textarea>
+                {{/if}}
+                {{#if this.is_select}}
+                    <select class="widget-form-select" name="{{ this.name }}">
+                        {{#each this.options}}
+                            <option value="{{ this.value }}">{{ this.label }}</option>
+                        {{/each}}
+                    </select>
+                {{/if}}
+                {{#if this.is_checkbox_group}}
+                    <div class="widget-form-checkbox-group">
+                        {{#each this.options}}
+                            <label class="widget-form-checkbox-label">
+                                <input type="checkbox" name="{{ ../name }}" value="{{ this.value }}" />
+                                {{ this.label }}
+                            </label>
+                        {{/each}}
+                    </div>
+                {{/if}}
+                {{#if this.is_date}}
+                    <input type="date" class="widget-form-input" name="{{ this.name }}"
+                        {{#if this.required}}required{{/if}} />
+                {{/if}}
+            </div>
+        {{/each}}
+    </div>
+    <div class="widget-form-actions">
+        {{#each actions}}
+            <button class="widget-form-action widget-form-action-{{ this.style }}"
+                data-action-name="{{ this.name }}">{{ this.label }}</button>
+        {{/each}}
+    </div>
+</div>
