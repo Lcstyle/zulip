@@ -143,3 +143,15 @@ export const form_submit_schema = z.object({
 });
 
 export type FormSubmitData = z.infer<typeof form_submit_schema>;
+
+// --- Form result inbound data (sent by bot after processing) ---
+
+export const form_result_schema = z.object({
+    type: z.literal("form_result"),
+    status: z.string(),
+    title: z.optional(z.string()),
+    url: z.optional(z.string()),
+    message: z.optional(z.string()),
+});
+
+export type FormResultData = z.infer<typeof form_result_schema>;

@@ -9,8 +9,8 @@ import type {Message} from "./message_store.ts";
 import * as transmit from "./transmit.ts";
 import type {Event} from "./widget_data.ts";
 import type {AnyWidgetData} from "./widget_schema.ts";
-import type {FormSubmitData, ZFormChoicesExtraData, ZFormFormExtraData} from "./zform_data.ts";
-import {form_submit_schema} from "./zform_data.ts";
+import type {FormResultData, FormSubmitData, ZFormChoicesExtraData, ZFormFormExtraData} from "./zform_data.ts";
+import {form_result_schema, form_submit_schema} from "./zform_data.ts";
 
 export const widget_type = "zform";
 
@@ -165,15 +165,42 @@ export function activate({
         }
     }
 
+    function show_result(result: FormResultData): void {
+        const is_success = result.status === "success";
+        const css_class = is_success ? "widget-form-result-success" : "widget-form-result-error";
+        const $result = $("<div>").addClass("widget-form-result").addClass(css_class);
+
+        if (result.title && result.url) {
+            $result.append(
+                $("<a>")
+                    .attr("href", result.url)
+                    .attr("target", "_blank")
+                    .attr("rel", "noopener noreferrer")
+                    .text(result.title),
+            );
+        }
+
+        if (result.message) {
+            $result.append($("<div>").addClass("widget-form-result-message").text(result.message));
+        }
+
+        $outer_elem.empty().append($result);
+    }
+
     function handle_events(events: Event[]): void {
         for (const event of events) {
             if (typeof event.data !== "object" || event.data === null) {
                 continue;
             }
+
+            const result_parsed = form_result_schema.safeParse(event.data);
+            if (result_parsed.success) {
+                show_result(result_parsed.data);
+                continue;
+            }
+
             const parsed = form_submit_schema.safeParse(event.data);
             if (parsed.success) {
-                // When someone submits the form, show the submitted state
-                // to all viewers of the message.
                 if (!form_submitted) {
                     show_submitted_state();
                 }

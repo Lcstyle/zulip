@@ -513,3 +513,33 @@ input {
         padding: 4px 0;
     }
 }
+
+/* Form result card (replaces form after bot responds) */
+.widget-form-result {
+    border-left: 4px solid hsl(153deg 40% 40%);
+    padding: 8px 12px;
+    margin: 4px 0;
+    max-width: 400px;
+    border-radius: 0 4px 4px 0;
+    background-color: var(--color-background-widget-button);
+
+    & a {
+        font-weight: 600;
+        color: hsl(207deg 56% 48%);
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .widget-form-result-message {
+        font-size: 0.9285em; /* 13px at 14px / em */
+        margin-top: 4px;
+    }
+}
+
+.widget-form-result-error {
+    border-left-color: hsl(0deg 56% 48%);
+}
+
