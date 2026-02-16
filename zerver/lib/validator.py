@@ -488,6 +488,9 @@ def check_widget_content(widget_content: object) -> dict[str, Any]:
                 ],
                 optional_keys=[
                     ("options", check_options),
+                    ("required", check_bool),
+                    ("placeholder", check_string),
+                    ("default", check_anything),
                 ],
             )
 

@@ -117,14 +117,39 @@ export function activate({
     function render_form(data: ZFormFormExtraData): void {
         // Precompute boolean flags for each field type since
         // Handlebars does not have an equality helper.
-        const fields_with_flags = data.fields.map((field) => ({
-            ...field,
-            is_text: field.type === "text",
-            is_textarea: field.type === "textarea",
-            is_select: field.type === "select",
-            is_checkbox_group: field.type === "checkbox_group",
-            is_date: field.type === "date",
-        }));
+        // Also compute selected/checked flags from default values.
+        const fields_with_flags = data.fields.map((field) => {
+            const base = {
+                ...field,
+                is_text: field.type === "text",
+                is_textarea: field.type === "textarea",
+                is_select: field.type === "select",
+                is_checkbox_group: field.type === "checkbox_group",
+                is_date: field.type === "date",
+            };
+
+            if (field.type === "select" && field.default && field.options) {
+                return {
+                    ...base,
+                    options: field.options.map((opt) => ({
+                        ...opt,
+                        selected: opt.value === field.default,
+                    })),
+                };
+            }
+
+            if (field.type === "checkbox_group" && field.default && field.options) {
+                return {
+                    ...base,
+                    options: field.options.map((opt) => ({
+                        ...opt,
+                        checked: field.default!.includes(opt.value),
+                    })),
+                };
+            }
+
+            return base;
+        });
 
         const template_data = {
             heading: data.heading,

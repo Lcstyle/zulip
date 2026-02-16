@@ -45,6 +45,7 @@ const form_text_field_schema = z.object({
     label: z.string(),
     required: z.optional(z.boolean()),
     placeholder: z.optional(z.string()),
+    default: z.optional(z.string()),
 });
 
 const form_textarea_field_schema = z.object({
@@ -53,6 +54,7 @@ const form_textarea_field_schema = z.object({
     label: z.string(),
     required: z.optional(z.boolean()),
     placeholder: z.optional(z.string()),
+    default: z.optional(z.string()),
 });
 
 const form_select_field_schema = z.object({
@@ -61,6 +63,7 @@ const form_select_field_schema = z.object({
     label: z.string(),
     required: z.optional(z.boolean()),
     options: z.array(form_option_schema),
+    default: z.optional(z.string()),
 });
 
 const form_checkbox_group_field_schema = z.object({
@@ -69,6 +72,7 @@ const form_checkbox_group_field_schema = z.object({
     label: z.string(),
     required: z.optional(z.boolean()),
     options: z.array(form_option_schema),
+    default: z.optional(z.array(z.string())),
 });
 
 const form_date_field_schema = z.object({
@@ -76,6 +80,7 @@ const form_date_field_schema = z.object({
     type: z.literal("date"),
     label: z.string(),
     required: z.optional(z.boolean()),
+    default: z.optional(z.string()),
 });
 
 export const form_field_schema = z.discriminatedUnion("type", [

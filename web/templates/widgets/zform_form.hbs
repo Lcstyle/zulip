@@ -9,18 +9,19 @@
                 </label>
                 {{#if this.is_text}}
                     <input type="text" class="widget-form-input" name="{{ this.name }}"
+                        {{#if this.default}}value="{{this.default}}"{{/if}}
                         {{#if this.placeholder}}placeholder="{{ this.placeholder }}"{{/if}}
                         {{#if this.required}}required{{/if}} />
                 {{/if}}
                 {{#if this.is_textarea}}
                     <textarea class="widget-form-textarea" name="{{ this.name }}" rows="4"
                         {{#if this.placeholder}}placeholder="{{ this.placeholder }}"{{/if}}
-                        {{#if this.required}}required{{/if}}></textarea>
+                        {{#if this.required}}required{{/if}}>{{this.default}}</textarea>
                 {{/if}}
                 {{#if this.is_select}}
                     <select class="widget-form-select" name="{{ this.name }}">
                         {{#each this.options}}
-                            <option value="{{ this.value }}">{{ this.label }}</option>
+                            <option value="{{ this.value }}" {{#if this.selected}}selected{{/if}}>{{ this.label }}</option>
                         {{/each}}
                     </select>
                 {{/if}}
@@ -28,7 +29,7 @@
                     <div class="widget-form-checkbox-group">
                         {{#each this.options}}
                             <label class="widget-form-checkbox-label">
-                                <input type="checkbox" name="{{ ../name }}" value="{{ this.value }}" />
+                                <input type="checkbox" name="{{ ../name }}" value="{{ this.value }}" {{#if this.checked}}checked{{/if}} />
                                 {{ this.label }}
                             </label>
                         {{/each}}
@@ -36,6 +37,7 @@
                 {{/if}}
                 {{#if this.is_date}}
                     <input type="date" class="widget-form-input" name="{{ this.name }}"
+                        {{#if this.default}}value="{{this.default}}"{{/if}}
                         {{#if this.required}}required{{/if}} />
                 {{/if}}
             </div>
