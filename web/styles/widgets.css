@@ -350,6 +350,68 @@ input {
     }
 }
 
+/* Rich embed card widget */
+.widget-rich-embed {
+    border-left: 4px solid hsl(207deg 56% 48%);
+    padding: 8px 12px;
+    margin: 4px 0;
+    max-width: 480px;
+    background-color: var(--color-background-widget-button);
+    border-radius: 0 4px 4px 0;
+
+    .widget-rich-embed-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+
+        & a {
+            color: hsl(207deg 56% 48%);
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .widget-rich-embed-description {
+        font-size: 0.9285em; /* 13px at 14px / em */
+        margin-bottom: 6px;
+        color: var(--color-text-default);
+    }
+
+    .widget-rich-embed-fields {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 16px;
+        margin-bottom: 6px;
+    }
+
+    .widget-rich-embed-field {
+        flex: 1 0 100%;
+    }
+
+    .widget-rich-embed-field-inline {
+        flex: 1 0 auto;
+        max-width: calc(50% - 8px);
+    }
+
+    .widget-rich-embed-field-name {
+        font-weight: 600;
+        font-size: 0.8571em; /* 12px at 14px / em */
+    }
+
+    .widget-rich-embed-field-value {
+        font-size: 0.9285em; /* 13px at 14px / em */
+    }
+
+    .widget-rich-embed-footer {
+        font-size: 0.7857em; /* 11px at 14px / em */
+        color: var(--color-text-default);
+        opacity: 0.7;
+        margin-top: 4px;
+    }
+}
+
 /* Interactive form widget */
 .widget-form {
     max-width: 400px;

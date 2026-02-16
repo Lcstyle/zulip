@@ -4,7 +4,7 @@ import {poll_widget_extra_data_schema} from "./poll_data.ts";
 import type {PollWidgetOutboundData} from "./poll_data.ts";
 import {todo_widget_extra_data_schema} from "./todo_widget.ts";
 import type {TodoWidgetOutboundData} from "./todo_widget.ts";
-import {zform_widget_extra_data_schema} from "./zform_data.ts";
+import {rich_embed_extra_data_schema, zform_widget_extra_data_schema} from "./zform_data.ts";
 import type {FormSubmitData} from "./zform_data.ts";
 
 /*
@@ -31,6 +31,11 @@ export const any_widget_data_schema = z.discriminatedUnion("widget_type", [
     z.object({
         widget_type: z.literal("todo"),
         extra_data: z.nullable(todo_widget_extra_data_schema),
+        visible_to_user_ids: z.optional(z.array(z.number())),
+    }),
+    z.object({
+        widget_type: z.literal("rich_embed"),
+        extra_data: z.nullable(rich_embed_extra_data_schema),
         visible_to_user_ids: z.optional(z.array(z.number())),
     }),
 ]);

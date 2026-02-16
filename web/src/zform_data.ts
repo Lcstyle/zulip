@@ -114,6 +114,26 @@ export const zform_widget_extra_data_schema = z.discriminatedUnion("type", [
 
 export type ZFormExtraData = z.infer<typeof zform_widget_extra_data_schema>;
 
+// --- Rich embed type ---
+
+const rich_embed_field_schema = z.object({
+    name: z.string(),
+    value: z.string(),
+    inline: z.optional(z.boolean()),
+});
+
+export const rich_embed_extra_data_schema = z.object({
+    type: z.literal("rich_embed"),
+    title: z.optional(z.string()),
+    description: z.optional(z.string()),
+    url: z.optional(z.string()),
+    color: z.optional(z.string()),
+    fields: z.optional(z.array(rich_embed_field_schema)),
+    footer: z.optional(z.string()),
+});
+
+export type RichEmbedExtraData = z.infer<typeof rich_embed_extra_data_schema>;
+
 // --- Form submission outbound data ---
 
 export const form_submit_schema = z.object({

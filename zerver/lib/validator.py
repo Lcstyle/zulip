@@ -522,6 +522,35 @@ def check_widget_content(widget_content: object) -> dict[str, Any]:
 
         raise ValidationError("unknown zform type: " + extra_data["type"])
 
+    if widget_type == "rich_embed":
+        check_field = check_dict(
+            [
+                ("name", check_string),
+                ("value", check_string),
+            ],
+            optional_keys=[
+                ("inline", check_bool),
+            ],
+        )
+
+        checker = check_dict(
+            [
+                ("type", equals("rich_embed")),
+            ],
+            optional_keys=[
+                ("title", check_string),
+                ("description", check_string),
+                ("url", check_url),
+                ("color", check_string),
+                ("fields", check_list(check_field)),
+                ("footer", check_string),
+            ],
+        )
+
+        checker("extra_data", extra_data)
+
+        return widget_content
+
     raise ValidationError("unknown widget type: " + widget_type)
 
 

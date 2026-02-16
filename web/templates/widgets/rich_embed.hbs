@@ -1,0 +1,23 @@
+<div class="widget-rich-embed" {{#if color}}style="border-left-color: {{color}}"{{/if}}>
+    {{#if title}}
+    <div class="widget-rich-embed-title">
+        {{#if url}}<a href="{{url}}" target="_blank" rel="noopener noreferrer">{{title}}</a>{{else}}{{title}}{{/if}}
+    </div>
+    {{/if}}
+    {{#if description}}
+    <div class="widget-rich-embed-description">{{description}}</div>
+    {{/if}}
+    {{#if fields}}
+    <div class="widget-rich-embed-fields">
+        {{#each fields}}
+        <div class="widget-rich-embed-field {{#if inline}}widget-rich-embed-field-inline{{/if}}">
+            <div class="widget-rich-embed-field-name">{{name}}</div>
+            <div class="widget-rich-embed-field-value">{{value}}</div>
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
+    {{#if footer}}
+    <div class="widget-rich-embed-footer">{{footer}}</div>
+    {{/if}}
+</div>
