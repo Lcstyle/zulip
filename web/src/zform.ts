@@ -178,6 +178,15 @@ export function activate({
             };
 
             callback(submit_data);
+
+            // Cancel: collapse the widget immediately instead of
+            // showing the disabled "submitted" state.
+            if (action_name === "cancel") {
+                $outer_elem.empty();
+                form_submitted = true;
+                return;
+            }
+
             show_submitted_state();
         });
     }
@@ -191,6 +200,12 @@ export function activate({
     }
 
     function show_result(result: FormResultData): void {
+        // Cancelled: collapse the widget entirely.
+        if (result.status === "cancelled") {
+            $outer_elem.empty();
+            return;
+        }
+
         const is_success = result.status === "success";
         const css_class = is_success ? "widget-form-result-success" : "widget-form-result-error";
         const $result = $("<div>").addClass("widget-form-result").addClass(css_class);
