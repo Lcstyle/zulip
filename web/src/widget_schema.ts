@@ -18,14 +18,20 @@ import type {FormSubmitData} from "./zform_data.ts";
 export type WidgetOutboundData = PollWidgetOutboundData | TodoWidgetOutboundData | FormSubmitData;
 
 export const any_widget_data_schema = z.discriminatedUnion("widget_type", [
-    z.object({widget_type: z.literal("poll"), extra_data: poll_widget_extra_data_schema}),
+    z.object({
+        widget_type: z.literal("poll"),
+        extra_data: poll_widget_extra_data_schema,
+        visible_to_user_ids: z.optional(z.array(z.number())),
+    }),
     z.object({
         widget_type: z.literal("zform"),
         extra_data: z.nullable(zform_widget_extra_data_schema),
+        visible_to_user_ids: z.optional(z.array(z.number())),
     }),
     z.object({
         widget_type: z.literal("todo"),
         extra_data: z.nullable(todo_widget_extra_data_schema),
+        visible_to_user_ids: z.optional(z.array(z.number())),
     }),
 ]);
 export type AnyWidgetData = z.infer<typeof any_widget_data_schema>;

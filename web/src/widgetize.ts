@@ -4,6 +4,7 @@ import type {GenericWidget, PostToServerFunction} from "./generic_widget.ts";
 import {create_widget_instance, is_supported_widget_type} from "./generic_widget.ts";
 import * as message_lists from "./message_lists.ts";
 import type {Message} from "./message_store.ts";
+import {current_user} from "./state_data.ts";
 import type {Event} from "./widget_data.ts";
 import type {AnyWidgetData} from "./widget_schema.ts";
 
@@ -47,6 +48,16 @@ export function activate(in_opts: ActivateArguments): void {
 
     // the callee will log any appropriate warnings here
     if (!is_supported_widget_type(any_data.widget_type)) {
+        return;
+    }
+
+    // If the widget is restricted to specific users, check visibility.
+    const visible_to = any_data.visible_to_user_ids;
+    if (visible_to && !visible_to.includes(current_user.user_id)) {
+        const $placeholder = $("<div>")
+            .addClass("widget-ephemeral-placeholder")
+            .text("Interactive form (visible to another user)");
+        set_widget_in_message($row, $placeholder);
         return;
     }
 

@@ -431,6 +431,10 @@ def check_widget_content(widget_content: object) -> dict[str, Any]:
     if "extra_data" not in widget_content:
         raise ValidationError("extra_data is not in widget_content")
 
+    # Optional: visible_to_user_ids restricts widget visibility to specific users.
+    if "visible_to_user_ids" in widget_content:
+        check_list(check_int)("visible_to_user_ids", widget_content["visible_to_user_ids"])
+
     widget_type = widget_content["widget_type"]
     extra_data = widget_content["extra_data"]
 

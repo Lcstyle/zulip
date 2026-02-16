@@ -269,6 +269,14 @@ input {
     }
 }
 
+/* Placeholder shown to users excluded from an ephemeral widget */
+.widget-ephemeral-placeholder {
+    font-style: italic;
+    color: var(--color-text-default);
+    opacity: 0.6;
+    padding: 4px 0;
+}
+
 .widget-error {
     color: hsl(1deg 45% 50%);
     font-size: 0.8571em; /* 12px at 14px/em */
